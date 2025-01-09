@@ -1,6 +1,7 @@
 import { Branch } from "src/seed/entities/branch.entity";
 import { Category } from "src/seed/entities/category.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/users/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('Teams')
 export class Team {
@@ -35,4 +36,7 @@ export class Team {
     @ManyToOne(() => Branch, (branch) => branch)
     @JoinColumn({ name: 'branchId' })
     branch: Branch;
+
+    @ManyToMany(() => User, (user) => user.teams)
+    managers: User[];
 }

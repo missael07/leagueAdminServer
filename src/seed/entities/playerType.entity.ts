@@ -12,5 +12,5 @@ export class PlayerType {
   value: number;
 
   @Column({ type: 'text' })
-  status: string;
+  isActive: string;
 }

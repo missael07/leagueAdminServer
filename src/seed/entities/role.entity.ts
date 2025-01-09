@@ -12,5 +12,5 @@ export class Role {
   value: number;
 
   @Column({ type: 'boolean' })
-  status: boolean;
+  isActive: boolean;
 }

@@ -33,8 +33,9 @@ export class SeedService {
 
     if (roleCount <= 0) {
       const roles: Role[] = [
-        { roleId: 1, name: 'Admin', value: 1, status: true},
-        { roleId: 2, name: 'Manager', value: 2, status: true},
+        { roleId: 1, name: 'Admin', value: 1, isActive: true},
+        { roleId: 2, name: 'Manager', value: 2, isActive: true},
+        { roleId: 3, name: 'Couch', value: 3, isActive: true},
       ]
 
       const queryBuilder = this.roleRepo.createQueryBuilder();
@@ -53,8 +54,8 @@ export class SeedService {
     if (branchesCount <= 0) {
 
       const branches: Branch[] = [
-        { branchId: 1, name: 'Varonil', value: 1, status: true},
-        { branchId: 2, name: 'Femenil', value: 2, status: true},
+        { branchId: 1, name: 'Varonil', value: 1, isActive: true},
+        { branchId: 2, name: 'Femenil', value: 2, isActive: true},
       ]
       const queryBuilder = this.branchRepo.createQueryBuilder();
 
@@ -71,10 +72,10 @@ export class SeedService {
     if (categoriesCount <= 0) {
 
       const categories: Category[] = [
-        { categoryId: 1, name: 'C', value: 1, status: true},
-        { categoryId: 2, name: 'D', value: 2, status: true },
-        { categoryId: 3, name: 'E', value: 3, status: true },
-        { categoryId: 4, name: 'R', value: 4, status: true },
+        { categoryId: 1, name: 'C', value: 1, isActive: true},
+        { categoryId: 2, name: 'D', value: 2, isActive: true },
+        { categoryId: 3, name: 'E', value: 3, isActive: true },
+        { categoryId: 4, name: 'R', value: 4, isActive: true },
       ]
       const queryBuilder = this.categoryRepo.createQueryBuilder();
 
@@ -92,9 +93,9 @@ export class SeedService {
     if (playerTypesCount <= 0) {
 
       const playerTypes: PlayerType[] = [
-        { playerTypeId: 1, name: 'Refuerzo', value: 1, status: 'active'},
-        { playerTypeId: 2, name: 'No puede jugar', value: 2, status: 'active'},
-        { playerTypeId: 3, name: 'No puede pitchar', value: 3, status: 'active'},
+        { playerTypeId: 1, name: 'Refuerzo', value: 1, isActive: 'active'},
+        { playerTypeId: 2, name: 'No puede jugar', value: 2, isActive: 'active'},
+        { playerTypeId: 3, name: 'No puede pitchar', value: 3, isActive: 'active'},
       ]
       const queryBuilder = this.playerTypeRepo.createQueryBuilder();
 

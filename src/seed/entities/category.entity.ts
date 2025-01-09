@@ -12,5 +12,5 @@ export class Category {
   value: number;
 
   @Column({ type: 'boolean' })
-  status: boolean;
+  isActive: boolean;
 }
