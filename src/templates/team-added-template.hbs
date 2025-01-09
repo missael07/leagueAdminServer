@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Bienvenidos a {{leagueName}}!</title>
+  <style>
+    /* Estilo del botón */
+    .btn {
+      display: inline-block;
+      background: #6c9ae1; /* Azul tenue */
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s ease, transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    /* Hover para el botón */
+    .btn:hover {
+      background: #577db6; /* Azul más oscuro */
+      transform: translateY(-2px); /* Elevación ligera */
+    }
+  </style>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f9f9f9; margin: 0; padding: 20px;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #ddd; border-radius: 8px; padding: 20px;">
+    <h1 style="color: #444; text-align: center;">¡Bienvenidos a la liga {{leagueName}}!</h1>
+    <p>Hola <strong>{{teamName}}</strong>,</p>
+    <p>¡Nos llena de orgullo darles la bienvenida a <strong>{{leagueName}}</strong>! Ahora forman parte de una comunidad apasionada por el deporte y comprometida con la excelencia.</p>
+    <p>Nos emociona anunciar que <strong>{{teamName}}</strong> competirá en la categoría <strong>{{category}}</strong>, rama <strong>{{division}}</strong>. Estamos seguros de que su participación enriquecerá la competencia, y de que demostrarán su talento y espíritu deportivo en cada encuentro.</p>
+    <p>Para comenzar su participación, les invitamos a acceder a su cuenta oficial haciendo clic en el siguiente enlace:</p>
+    <p style="text-align: center;">
+      <a href="{{accessLink}}" class="btn">Iniciar Sesión</a>
+    </p>
+    <p>Recuerden que deben usar el correo electrónico asociado a su equipo <strong>{{email}}</strong> para iniciar sesión.</p>
+    <p>Si tienen alguna pregunta, necesitan asistencia o simplemente desean saber más sobre la liga, nuestro equipo está aquí para ayudarlos.</p>
+    <p>¡Gracias por unirse a <strong>{{leagueName}}</strong>! Estamos ansiosos por verlos brillar en el campo y escribir juntos una nueva historia en la competencia.</p>
+    <p style="text-align: center; font-weight: bold;">Con entusiasmo deportivo,<br>El comité de {{leagueName}}</p>
+  </div>
+</body>
+</html>
