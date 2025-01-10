@@ -8,13 +8,14 @@ import { SeedService } from './seed.service';
 import { SeedController } from './seed.controller';
 import { Branch } from './entities/branch.entity';
 import { Category } from './entities/category.entity';
+import { Menu } from './entities/menu.entity';
 
 @Module({
   controllers: [SeedController],
   providers: [SeedService],
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Role,  PlayerType, Branch, Category]),
+    TypeOrmModule.forFeature([Role,  PlayerType, Branch, Category, Menu]),
   ],
 })
 export class SeedModule {}

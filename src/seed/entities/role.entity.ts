@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany } from 'typeorm';
+import { Menu } from './menu.entity';
 
 @Entity('Roles')
 export class Role {
@@ -13,4 +14,7 @@ export class Role {
 
   @Column({ type: 'boolean' })
   isActive: boolean;
+
+  @ManyToMany(() => Menu, (menu) => menu.roles)
+  menus: Menu[];
 }

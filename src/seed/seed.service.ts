@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { PlayerType } from './entities/playerType.entity';
 import { Branch } from './entities/branch.entity';
 import { Category } from './entities/category.entity';
+import { Menu } from './entities/menu.entity';
 
 @Injectable()
 export class SeedService {
@@ -17,7 +18,9 @@ export class SeedService {
     @InjectRepository(Branch)
     private readonly branchRepo: Repository<Branch>,
     @InjectRepository(Category)
-    private readonly categoryRepo: Repository<Category>
+    private readonly categoryRepo: Repository<Category>,
+    @InjectRepository(Menu)
+    private readonly menuRepo: Repository<Menu>
   ){}
 
   async create() {
@@ -25,6 +28,7 @@ export class SeedService {
     await this._createPlayerTypes();
     await this._createBranches();
     await this._createCategories();
+    await this._createMenusByRole();
     return 'Create data successfully';
   }
 
@@ -33,9 +37,9 @@ export class SeedService {
 
     if (roleCount <= 0) {
       const roles: Role[] = [
-        { roleId: 1, name: 'Admin', value: 1, isActive: true},
-        { roleId: 2, name: 'Manager', value: 2, isActive: true},
-        { roleId: 3, name: 'Couch', value: 3, isActive: true},
+        { roleId: 1, name: 'Admin', value: 1, isActive: true, menus: []},
+        { roleId: 2, name: 'Manager', value: 2, isActive: true, menus: []},
+        { roleId: 3, name: 'Couch', value: 3, isActive: true, menus: []},
       ]
 
       const queryBuilder = this.roleRepo.createQueryBuilder();
@@ -66,6 +70,7 @@ export class SeedService {
         .execute();
     }
   }
+
   private async _createCategories(){
     const categoriesCount = await this.categoryRepo.count();
 
@@ -104,6 +109,40 @@ export class SeedService {
         .into(PlayerType)
         .values(playerTypes)
         .execute();
+    }
+  }
+
+  private async _createMenusByRole() {
+    const menusCount = await this.menuRepo.find();
+
+    if (menusCount.length <= 0) {
+      const admin = await this.roleRepo.findOne({ where: { value: 1 } });
+      const manager = await this.roleRepo.findOne({ where: { value: 2 } });
+      const coach = await this.roleRepo.findOne({ where: { value: 3 } });
+
+
+      if (!admin || !manager || !coach ) {
+        throw new Error('Roles not found');
+      }
+
+      const menus: Menu[] = [
+        {
+          menuId: 1, menuName: 'Equipos', route: 'company-list', icon: 'mdi-domain', roles: [admin]
+        },
+        {
+          menuId: 2, menuName: 'Usuarios', route: 'users-list', icon: 'mdi-home', roles: [admin]
+        },
+        {
+          menuId: 3, menuName: 'Cedulas', route: 'rosters-list', icon: 'mdi-account-outline', roles: [admin, manager, coach]
+        },
+        {
+          menuId: 4, menuName: 'Ajustes', route: 'account-settings', icon: 'mdi-cog', roles: [admin, manager, coach]
+        },
+
+      ];
+
+      await this.menuRepo.save(menus);
+
     }
   }
 
