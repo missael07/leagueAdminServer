@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { SeedModule } from './seed/seed.module';
 import { TeamsModule } from './teams/teams.module';
+import { CommonModule } from './common/common.module';
 
 
 @Module({
@@ -21,7 +22,8 @@ import { TeamsModule } from './teams/teams.module';
     }),
     UsersModule,
     SeedModule,
-    TeamsModule
+    TeamsModule,
+    CommonModule
   ],
   controllers: [],
   providers: [],

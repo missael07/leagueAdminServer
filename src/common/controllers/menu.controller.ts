@@ -6,8 +6,8 @@ export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
   @Get()
-  findAll(@Query('role') role: string, @Query('companyType') companyType: string) {
-    return this.menuService.getMenusByRole(+role, +companyType);
+  findAll(@Query('role') role: string) {
+    return this.menuService.getMenusByRole(+role);
   }
 
 }
