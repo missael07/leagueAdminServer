@@ -10,23 +10,19 @@ export class CreateUserDto {
     @Transform(({ value }) => StringUtil.clean(value))
     email: string;
 
-    @IsNotEmpty({ message: 'El nombre de usuario es requerido.'})
-    @Transform(({ value }) => StringUtil.clean(value) )
-    userName: string;
-
     @IsNotEmpty({ message: 'El rol es requerido.' })
     @Transform(({ value }) => isNaN(value) ? '' : value)
     roleId: Role;
 
-    @MinLength(6, { message: 'La contraseña debe de contener al menos 6 caracteres' })
-    @MaxLength(12, { message: 'La contraseña debe de contener maximo 16 caracteres' })
-    @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-      message:
-        'La contraseña debe de contener una minuscula, mayuscula, un numero y un caracter especial',
-    })
-    @IsNotEmpty({ message: 'La contraseña es requerida.' })
-    @Transform(({ value }) => StringUtil.cleanPassword(value))
-    password: string;
+    // @MinLength(6, { message: 'La contraseña debe de contener al menos 6 caracteres' })
+    // @MaxLength(12, { message: 'La contraseña debe de contener maximo 16 caracteres' })
+    // @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+    //   message:
+    //     'La contraseña debe de contener una minuscula, mayuscula, un numero y un caracter especial',
+    // })
+    // @IsNotEmpty({ message: 'La contraseña es requerida.' })
+    // @Transform(({ value }) => StringUtil.cleanPassword(value))
+    // password: string;
   
 
     @IsNotEmpty({ message: 'El nombre es requerido.' })
@@ -42,7 +38,7 @@ export class CreateUserDto {
     phoneNumber: string;
 
     @IsNotEmpty({ message: 'Debe de tener un equipo asignado.' })
-    @Transform(({ value }) => isNaN(value) ? '' : value)
+    @Transform(({ value }) => isNaN(value) || value === 0 ? '' : value)
     teamId: number;
 
 }

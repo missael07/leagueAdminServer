@@ -1,14 +1,14 @@
 import { Transform } from "class-transformer";
-import { IsBoolean, IsNotEmpty } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty } from "class-validator";
 import { Role } from "src/common/enums/roles/role.enum";
 import { StringUtil } from "src/common/utils/clean.service";
 
 export class UpdateUserDto {
 
 
-    @IsNotEmpty({ message: 'El nombre de usuario es requerido.' })
+    @IsEmail({}, { message: 'Ingrese un correo electronico valido.' })
     @Transform(({ value }) => StringUtil.clean(value))
-    userName: string;
+    email: string;
 
     @IsNotEmpty({ message: 'El rol es requerido.' })
     @Transform(({ value }) => isNaN(value) ? '' : value)

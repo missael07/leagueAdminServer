@@ -257,4 +257,14 @@ export class TeamsService {
     const message = team.isActive ? 'habilitado' : 'deshabilitado';
     return this._responseHanlder.handleSuccess<TeamResponse>([], `Cuota pagada correctamente.`, this._map(team, 'mapFndAll001'))
   }
+
+  async getTeamsForSelect() {
+    const teams = await this._teamRepo.createQueryBuilder('t')
+      .select(['t.teamId', 't.name'])
+      .where('t.isActive = :isActive', { isActive: true })
+      .orderBy('t.name', 'ASC')
+      .getMany();
+
+    return this._responseHanlder.handleSuccess(teams.map(( team: Team) => ({value: team.teamId, title: team.name})), '', null);
+  }
 }

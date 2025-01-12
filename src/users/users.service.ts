@@ -10,6 +10,7 @@ import { SendEmailService } from 'src/common/services/email/sendEmail';
 import { Team } from 'src/teams/entities/team.entity';
 import { UserResponse } from './interfaces/userResponse.interface';
 import * as bcrypt from 'bcrypt';
+import { StringUtil } from 'src/common/utils/clean.service';
 
 @Injectable()
 export class UsersService {
@@ -49,13 +50,19 @@ export class UsersService {
     }
   }
 
+  private _BuildUserName(firstName: string, lastName: string) {
+    const firstLetter = firstName.charAt(0);
+    return `${firstLetter}${lastName}`.toLowerCase();
+  }
+
   private async _createTeamObj(createUserDto: CreateUserDto, role: Role, team: Team, errCode: string) {
     try {
-      const { firstName, lastName, email, phoneNumber, password: pass, userName } = createUserDto;
+      const { firstName, lastName, email, phoneNumber } = createUserDto;
       const createdBy = 'Missael Padilla';
       const createdDate = new Date()
       const teams = [team];
-      const password = bcrypt.hashSync(pass, 10)
+      const password = bcrypt.hashSync(process.env.TEMP_PASSWORD, 10);
+      const userName = this._BuildUserName(firstName, lastName);
       const user = await this._userRepo.create({
         createdBy,
         createdDate,
@@ -88,12 +95,17 @@ export class UsersService {
       const userMapped: UserResponse = {
         id: user.userId,
         userName: user.userName,
-        name: `${user.firstName} ${user.lastName}`,
+        fullName: `${user.firstName} ${user.lastName}`,
         isActive: user.isActive,
         email: user.email,
         createdBy: user.createdBy,
-        role: user.role.name,
-        teams: user.teams
+        role: user.role.value,
+        roleName: user.role.name,
+        team: user.teams?.map((team) => (team.name)),
+        teamIds: user.teams?.map((team) => (team.teamId)),
+        phoneNumber: user.phoneNumber,
+        firstName: user.firstName,
+        lastName: user.lastName
       };
       return userMapped;
     } catch (error) {
@@ -138,7 +150,7 @@ export class UsersService {
       .getOne();
 
     if (!user) {
-      return this._responseHanlder.handleExceptions('getUserFnd001', 'No se encontro el equipo.');
+      return this._responseHanlder.handleExceptions('getUserUpdFnd001', 'No se encontro el usuario.');
     }
 
     if(user.role.value !== updateUserDto.roleId) {
@@ -149,7 +161,8 @@ export class UsersService {
     user.firstName = updateUserDto.firstName;
     user.lastName = updateUserDto.lastName;
     user.phoneNumber = updateUserDto.phoneNumber;
-    user.userName = updateUserDto.userName;
+    user.email = updateUserDto.email;
+    // user.userName = this._BuildUserName(updateUserDto.firstName, updateUserDto.lastName);
     user.isActive = updateUserDto.isActive;
     user.updatedBy = 'Missael Padilla';
     user.updatedDate = new Date();

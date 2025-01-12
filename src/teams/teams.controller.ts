@@ -17,6 +17,11 @@ export class TeamsController {
     return this.teamsService.findAll(JSON.parse(data));
   }
 
+  @Get('getTeamsForSelect')
+  getTeams() {
+    return this.teamsService.getTeamsForSelect();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.teamsService.findOne(+id);
@@ -34,7 +39,6 @@ export class TeamsController {
 
   @Put('pay/:id')
   pay(@Param('id') id: string) {
-    console.log('id', id);
     return this.teamsService.pay(+id);
   }
 }
