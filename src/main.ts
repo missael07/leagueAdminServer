@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { CustomValidationExceptionFilter } from './common/utils/customValidationFilter';
+import { CustomValidationException } from './common/utils/customValidation';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +16,7 @@ async function bootstrap() {
     new ValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true,
+    exceptionFactory: (errors) => new CustomValidationException(errors),
     })
    );
 

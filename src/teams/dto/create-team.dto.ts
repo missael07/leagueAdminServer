@@ -14,12 +14,12 @@ export class CreateTeamDto {
     @Transform(({ value }) => StringUtil.clean(value))
     email: string;
 
-    @IsNotEmpty({ message: 'La Categoria requerido.' })
-    @Transform(({ value }) => isNaN(value) ? '' : value)
+    @IsNotEmpty({ message: 'La Categoria es requerida.' })
+    @Transform(({ value }) => isNaN(value) || value === 0 ? '' : value)
     category: Category;
 
     @IsNotEmpty({ message: 'La rama es requerida.' })
-    @Transform(({ value }) => isNaN(value) ? '' : value)
+    @Transform(({ value }) => isNaN(value) || value === 0 ? '' : value)
     branch: Branch;
 
     @IsBoolean()

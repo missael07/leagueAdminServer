@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
@@ -13,8 +13,8 @@ export class TeamsController {
   }
 
   @Get()
-  findAll() {
-    return this.teamsService.findAll();
+  findAll(@Query('data') data: string) {
+    return this.teamsService.findAll(JSON.parse(data));
   }
 
   @Get(':id')
@@ -30,5 +30,11 @@ export class TeamsController {
   @Put('changeStatus/:id')
   changeStatus(@Param('id') id: string) {
     return this.teamsService.changeStatus(+id);
+  }
+
+  @Put('pay/:id')
+  pay(@Param('id') id: string) {
+    console.log('id', id);
+    return this.teamsService.pay(+id);
   }
 }

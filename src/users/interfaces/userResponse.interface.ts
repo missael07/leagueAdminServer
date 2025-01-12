@@ -1,4 +1,4 @@
-import { Team } from "src/teams/entities/team.entity";
+import { TeamResponse } from "src/teams/interfaces/responseTeam.interface";
 
 export interface UserResponse {
     id: number;
@@ -8,5 +8,6 @@ export interface UserResponse {
     email: string;
     createdBy: string;
     isActive: boolean;
-    teams: Team[]
+    team: string[];
+    phoneNumber: string;
 }

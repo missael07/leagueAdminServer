@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './entities/team.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from 'src/seed/entities/category.entity';
 import { Branch } from 'src/seed/entities/branch.entity';
 import { ResponseHandlerService } from 'src/common/handlers/respose.handler';
 import { SendEmailService } from 'src/common/services/email/sendEmail';
 import { TeamResponse } from './interfaces/responseTeam.interface';
+import { TeamFilter } from './interfaces/teamFilter.interface';
 
 @Injectable()
 export class TeamsService {
@@ -32,7 +33,7 @@ export class TeamsService {
       return this._responseHanlder.handleExceptions(errCode, error.message ?? error.detail);
     }
   }
-  
+
   private async _getBranch(branchId: number, errCode: string) {
     try {
       const branch = await this._branchRepo.createQueryBuilder('b').where('b.branchId = :branchId', { branchId }).getOne();
@@ -42,9 +43,9 @@ export class TeamsService {
     }
   }
 
-  private async _createTeamObj(createTeamDto: CreateTeamDto, category: Category, branch: Branch, errCode: string){
+  private async _createTeamObj(createTeamDto: CreateTeamDto, category: Category, branch: Branch, errCode: string) {
     try {
-      const { name } = createTeamDto;
+      const { name, isPaid } = createTeamDto;
       const createdBy = 'Missael Padilla';
       const createdDate = new Date()
       const team = await this._teamRepo.create({
@@ -52,7 +53,8 @@ export class TeamsService {
         createdDate,
         name,
         category,
-        branch
+        branch,
+        isPaid
       })
       return team;
     } catch (error) {
@@ -95,85 +97,111 @@ export class TeamsService {
     }
   }
 
-  private async _sendEmail(email: string,teamName: string, category: string, division: string) {
+  private async _sendEmail(email: string, teamName: string, category: string, division: string) {
     const context = { url: '', websiteName: '', teamName, leagueName: 'Liga Premier de Softball de Mexicali', email, category, division };
     let template;
     let subject;
 
     const newData = this._getDataNewInvite(teamName);
-      context.url = newData.url;
-      template = newData.template;
-      subject = newData.subject;
+    context.url = newData.url;
+    template = newData.template;
+    subject = newData.subject;
 
-      await this._sendEmailService.sendEmail(
-        email,
-        context,
-        template,
-        subject,
-      );
+    await this._sendEmailService.sendEmail(
+      email,
+      context,
+      template,
+      subject,
+    );
   }
 
   async create(createTeamDto: CreateTeamDto) {
     const { category, branch, email } = createTeamDto;
     const categoryToSave = await this._getCategory(category, 'getCategoryCrt001');
-    if(!categoryToSave) {
+    if (!categoryToSave) {
       return this._responseHanlder.handleExceptions('getCategoryCrt001', 'No se encontro la categoria.');
     }
     const branchToSave = await this._getBranch(branch, 'getBranchCrt001');
-    if(!branchToSave) {
+    if (!branchToSave) {
       return this._responseHanlder.handleExceptions('getBranchCrt001', 'No se encontro la rama');
     }
     const team = await this._createTeamObj(createTeamDto, categoryToSave, branchToSave, 'getObjCrt001');
     const result = await this._save(team, 'saveTeamCrt001');
 
-    await this._sendEmail(email, result.name,categoryToSave.name, branchToSave.name);
+    await this._sendEmail(email, result.name, categoryToSave.name, branchToSave.name);
 
-    return this._responseHanlder.handleSuccess<TeamResponse>([], 'El equipo se agrego correctamente.', this._map(result, 'mapCrt001') )
+    return this._responseHanlder.handleSuccess<TeamResponse>([], 'El equipo se agrego correctamente.', this._map(result, 'mapCrt001'))
   }
 
-  async findAll() {
-    const teams = await this._teamRepo.createQueryBuilder('t')
-    .leftJoinAndSelect('t.category', 'c')
-    .leftJoinAndSelect('t.branch', 'b')
-    .where('t.isActive = :status', { status: true})
-    .getMany();
+  async findAll(data: TeamFilter) {
+    const { term, isActive, category, branch, isPaid } = data;
+    const queryBuilder = this._teamRepo.createQueryBuilder('t')
+      .leftJoinAndSelect('t.category', 'c')
+      .leftJoinAndSelect('t.branch', 'b')
+      .where('1 = 1')
+      .orderBy('t.teamId', 'DESC');
 
-    return this._responseHanlder.handleSuccess<TeamResponse>(teams.map( (team) => (this._map(team,'mapFndAll001'))), '',null)
+    if (isActive !== null) {
+      queryBuilder.andWhere('t.isActive = :isActive', { isActive })
+    }
+
+    if (category) {
+      queryBuilder.andWhere('t.categoryId = :category', { category })
+    }
+
+    if (branch) {
+      queryBuilder.andWhere('t.branchId = :branch', { branch })
+    }
+
+    if (isPaid !== null) {
+      queryBuilder.andWhere('t.isPaid = :isPaid', { isPaid })
+    }
+
+    if (term) {
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('t.name ILIKE :term', { term: `%${term}%` })
+        }),
+      );
+    }
+
+    const teams = await queryBuilder.getMany();
+    return this._responseHanlder.handleSuccess<TeamResponse>(teams.map((team) => (this._map(team, 'mapFndAll001'))), '', null)
   }
 
   async findOne(teamId: number) {
     const team = await this._teamRepo.createQueryBuilder('t')
-    .leftJoinAndSelect('t.category', 'c')
-    .leftJoinAndSelect('t.branch', 'b')
-    .where('t.teamId = :teamId', { teamId })
-    .getOne();
+      .leftJoinAndSelect('t.category', 'c')
+      .leftJoinAndSelect('t.branch', 'b')
+      .where('t.teamId = :teamId', { teamId })
+      .getOne();
 
-    return this._responseHanlder.handleSuccess<TeamResponse>([], '',this._map(team,'mapFndAll001'))
+    return this._responseHanlder.handleSuccess<TeamResponse>([], '', this._map(team, 'mapFndAll001'))
   }
 
   async update(teamId: number, updateTeamDto: UpdateTeamDto) {
     const { category, branch, name, isPaid, isActive } = updateTeamDto;
     const team = await this._teamRepo.createQueryBuilder('t')
-    .leftJoinAndSelect('t.category', 'c')
-    .leftJoinAndSelect('t.branch', 'b')
-    .where('t.teamId = :teamId', { teamId })
-    .getOne();
+      .leftJoinAndSelect('t.category', 'c')
+      .leftJoinAndSelect('t.branch', 'b')
+      .where('t.teamId = :teamId', { teamId })
+      .getOne();
 
-    if(!team) {
+    if (!team) {
       return this._responseHanlder.handleExceptions('getTeamFnd001', 'No se encontro el equipo.');
     }
 
-    if(team.category.value !== category) {
+    if (team.category.value !== category) {
       const categoryToSave = await this._getCategory(category, 'getCategoryCrt001');
-      if(!categoryToSave) {
+      if (!categoryToSave) {
         return this._responseHanlder.handleExceptions('getCategoryCrt001', 'No se encontro la categoria.');
       }
       team.category = categoryToSave;
     }
 
-    if(team.branch.value !== branch){
+    if (team.branch.value !== branch) {
       const branchToSave = await this._getBranch(branch, 'getBranchCrt001');
-      if(!branchToSave) {
+      if (!branchToSave) {
         return this._responseHanlder.handleExceptions('getBranchCrt001', 'No se encontro la rama');
       }
       team.branch = branchToSave;
@@ -186,18 +214,18 @@ export class TeamsService {
     team.updatedDate = new Date();
 
     await this._save(team, 'saveTeamUpd001');
-    return this._responseHanlder.handleSuccess<TeamResponse>([], `El equipo ${team.name} se a actualizado correctamente.`,this._map(team,'mapFndAll001'))
+    return this._responseHanlder.handleSuccess<TeamResponse>([], `El equipo ${team.name} se a actualizado correctamente.`, this._map(team, 'mapFndAll001'))
 
   }
 
   async changeStatus(teamId: number) {
     const team = await this._teamRepo.createQueryBuilder('t')
-    .leftJoinAndSelect('t.category', 'c')
-    .leftJoinAndSelect('t.branch', 'b')
-    .where('t.teamId = :teamId', { teamId })
-    .getOne();
+      .leftJoinAndSelect('t.category', 'c')
+      .leftJoinAndSelect('t.branch', 'b')
+      .where('t.teamId = :teamId', { teamId })
+      .getOne();
 
-    if(!team) {
+    if (!team) {
       return this._responseHanlder.handleExceptions('getTeamFnd001', 'No se encontro el equipo.');
     }
 
@@ -207,6 +235,26 @@ export class TeamsService {
 
     await this._save(team, 'saveTeamChngStat001');
     const message = team.isActive ? 'habilitado' : 'deshabilitado';
-    return this._responseHanlder.handleSuccess<TeamResponse>([], `El equipo ${team.name} se a ${message} correctamente.`,this._map(team,'mapFndAll001'))
+    return this._responseHanlder.handleSuccess<TeamResponse>([], `El equipo ${team.name} se a ${message} correctamente.`, this._map(team, 'mapFndAll001'))
+  }
+
+  async pay(teamId: number) {
+    const team = await this._teamRepo.createQueryBuilder('t')
+      .leftJoinAndSelect('t.category', 'c')
+      .leftJoinAndSelect('t.branch', 'b')
+      .where('t.teamId = :teamId', { teamId })
+      .getOne();
+
+    if (!team) {
+      return this._responseHanlder.handleExceptions('getTeamFnd001', 'No se encontro el equipo.');
+    }
+
+    team.isPaid = true;
+    team.updatedBy = 'Missael Padilla';
+    team.updatedDate = new Date();
+
+    await this._save(team, 'saveTeamChngStat001');
+    const message = team.isActive ? 'habilitado' : 'deshabilitado';
+    return this._responseHanlder.handleSuccess<TeamResponse>([], `Cuota pagada correctamente.`, this._map(team, 'mapFndAll001'))
   }
 }

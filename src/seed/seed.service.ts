@@ -77,10 +77,12 @@ export class SeedService {
     if (categoriesCount <= 0) {
 
       const categories: Category[] = [
-        { categoryId: 1, name: 'C', value: 1, isActive: true},
-        { categoryId: 2, name: 'D', value: 2, isActive: true },
-        { categoryId: 3, name: 'E', value: 3, isActive: true },
-        { categoryId: 4, name: 'R', value: 4, isActive: true },
+        { categoryId: 1, name: 'R', value: 1, isActive: true},
+        { categoryId: 2, name: 'E', value: 2, isActive: true },
+        { categoryId: 3, name: 'D', value: 3, isActive: true },
+        { categoryId: 4, name: 'C', value: 4, isActive: true },
+        { categoryId: 5, name: 'B', value: 5, isActive: true },
+        { categoryId: 6, name: 'A', value: 6, isActive: true },
       ]
       const queryBuilder = this.categoryRepo.createQueryBuilder();
 
