@@ -26,6 +26,15 @@ export class UsersService {
     private readonly _sendEmailService: SendEmailService
   ) { }
 
+  private async _getDuplicateUser(userName: string, errCode: string) {
+    const userCount = await this._userRepo.createQueryBuilder('u')
+      .leftJoinAndSelect('u.role', 'r')
+      .leftJoinAndSelect('u.teams', 't')
+      .where('u.userName = :userName', { userName })
+      .getCount();
+
+    return userCount > 0 ? userCount : '';
+  }
   private async _getRole(roleId: number, errCode: string) {
     try {
       const role = await this._roleRepo.findOne({ where: { roleId } });
@@ -50,9 +59,11 @@ export class UsersService {
     }
   }
 
-  private _BuildUserName(firstName: string, lastName: string) {
+  private async _BuildUserName(firstName: string, lastName: string) {
     const firstLetter = firstName.charAt(0);
-    return `${firstLetter}${lastName}`.toLowerCase();
+    const userName = `${firstLetter}${lastName}`.toLowerCase();
+    return `${userName}${await this._getDuplicateUser(userName, 'getDupUsr001')}`.toLowerCase();
+
   }
 
   private async _createTeamObj(createUserDto: CreateUserDto, role: Role, team: Team, errCode: string) {
@@ -62,7 +73,7 @@ export class UsersService {
       const createdDate = new Date()
       const teams = [team];
       const password = bcrypt.hashSync(process.env.TEMP_PASSWORD, 10);
-      const userName = this._BuildUserName(firstName, lastName);
+      const userName = await this._BuildUserName(firstName, lastName);
       const user = await this._userRepo.create({
         createdBy,
         createdDate,
@@ -153,8 +164,8 @@ export class UsersService {
       return this._responseHanlder.handleExceptions('getUserUpdFnd001', 'No se encontro el usuario.');
     }
 
-    if(user.role.value !== updateUserDto.roleId) {
-      const role = await this._getRole(updateUserDto.roleId, 'getRoleUpd001' );
+    if (user.role.value !== updateUserDto.roleId) {
+      const role = await this._getRole(updateUserDto.roleId, 'getRoleUpd001');
       user.role = role;
     }
 

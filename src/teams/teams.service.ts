@@ -25,6 +25,23 @@ export class TeamsService {
     private readonly _sendEmailService: SendEmailService
   ) { }
 
+  private async _getDuplicateTeam(name: string, branch: number, category: number, errCode: string) {
+
+    try {
+      const team = await this._teamRepo.createQueryBuilder('t')
+      .leftJoinAndSelect('t.category', 'c')
+      .leftJoinAndSelect('t.branch', 'b')
+      .where('t.name = :name', { name })
+      .andWhere('t.branchId = :branch', { branch })
+      .andWhere('t.categoryId = :category', { category })
+      .getOne();
+  
+      return team;
+    } catch (error) {
+      return this._responseHanlder.handleExceptions(errCode, error.message ?? error.detail);
+    }
+  }
+
   private async _getCategory(categoryId: number, errCode: string) {
     try {
       const category = await this._categoryRepo.createQueryBuilder('c').where('c.categoryId = :categoryId', { categoryId }).getOne();
@@ -117,6 +134,13 @@ export class TeamsService {
 
   async create(createTeamDto: CreateTeamDto) {
     const { category, branch, email } = createTeamDto;
+
+    const duplicateTeam = await this._getDuplicateTeam(createTeamDto.name, branch, category, 'getDuplicateTeamCrt001');
+
+    if(duplicateTeam) {
+      return this._responseHanlder.handleExceptions('getDuplicateTeamCrt002', 'Ya existe un equipo con el mismo nombre en la misma rama y categoria.');
+    }
+
     const categoryToSave = await this._getCategory(category, 'getCategoryCrt001');
     if (!categoryToSave) {
       return this._responseHanlder.handleExceptions('getCategoryCrt001', 'No se encontro la categoria.');
