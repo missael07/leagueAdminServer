@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { SeedModule } from './seed/seed.module';
 import { TeamsModule } from './teams/teams.module';
 import { CommonModule } from './common/common.module';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
@@ -23,7 +24,8 @@ import { CommonModule } from './common/common.module';
     UsersModule,
     SeedModule,
     TeamsModule,
-    CommonModule
+    CommonModule,
+    AuthModule
   ],
   controllers: [],
   providers: [],

@@ -1,6 +1,7 @@
 import { Role } from "src/seed/entities/role.entity";
 import { Team } from "src/teams/entities/team.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import * as bcrypt from 'bcrypt';
 
 @Entity('Users')
 export class User {
@@ -66,4 +67,10 @@ export class User {
     checkFieldsBeforeUpdate() {
         this.email = this.email.toLowerCase().trim();
     }
+
+    comparePassword(password: string): boolean {
+        return bcrypt.compare(password, this.password);
+    }
 }
+
+
