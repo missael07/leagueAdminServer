@@ -10,7 +10,6 @@ import { SendEmailService } from 'src/common/services/email/sendEmail';
 import { Team } from 'src/teams/entities/team.entity';
 import { UserResponse } from './interfaces/userResponse.interface';
 import * as bcrypt from 'bcrypt';
-import { StringUtil } from 'src/common/utils/clean.service';
 
 @Injectable()
 export class UsersService {
@@ -199,6 +198,6 @@ export class UsersService {
 
     await this._save(user, 'saveUserChngStat001');
     const message = user.isActive ? 'habilitado' : 'deshabilitado';
-    return this._responseHanlder.handleSuccess<UserResponse>([], `El equipo ${user.firstName}  se a ${message} correctamente.`, this._map(user, 'mapUsrChngStat001'))
+    return this._responseHanlder.handleSuccess<UserResponse>([], `El usario ${user.userName} se a ${message} correctamente.`, this._map(user, 'mapUsrChngStat001'))
   }
 }

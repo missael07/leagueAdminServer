@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { ResponseHandlerService } from 'src/common/handlers/respose.handler';
 import { JWTPayload } from 'src/common/interfaces/jwt.interface';
 import { JwtService } from '@nestjs/jwt';
+import { AuthResponse } from './interface/authResponse';
 
 @Injectable()
 export class AuthService {
@@ -102,6 +103,6 @@ export class AuthService {
 
     await this._unlockUser(user.userId);
 
-    return this._responseHanlder.handleSuccess(null, '', await this._getToken(user));
+    return this._responseHanlder.handleSuccess<AuthResponse>(null, '', await this._getToken(user));
   }
 }

@@ -28,7 +28,7 @@ export class UsersController {
   }
 
   @Put(':id')
-  remove(@Param('id') id: string) {
+  changeStatus(@Param('id') id: string) {
     return this.usersService.changeStatus(+id);
   }
 }

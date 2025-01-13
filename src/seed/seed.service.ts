@@ -129,16 +129,16 @@ export class SeedService {
 
       const menus: Menu[] = [
         {
-          menuId: 1, menuName: 'Equipos', route: 'company-list', icon: 'mdi-domain', roles: [admin]
+          menuId: 1, menuName: 'Equipos', route: '/admin/team/teamlist', icon: 'mdi-domain', roles: [admin]
         },
         {
-          menuId: 2, menuName: 'Usuarios', route: 'users-list', icon: 'mdi-home', roles: [admin]
+          menuId: 2, menuName: 'Usuarios', route: '/admin/users/userslist', icon: 'mdi-home', roles: [admin]
         },
         {
-          menuId: 3, menuName: 'Cedulas', route: 'rosters-list', icon: 'mdi-account-outline', roles: [admin, manager, coach]
+          menuId: 3, menuName: 'Cedulas', route: '/admin/rosters/rosterslist', icon: 'mdi-account-outline', roles: [admin, manager, coach]
         },
         {
-          menuId: 4, menuName: 'Ajustes', route: 'account-settings', icon: 'mdi-cog', roles: [admin, manager, coach]
+          menuId: 4, menuName: 'Ajustes', route: '/account/settings', icon: 'mdi-cog', roles: [admin, manager, coach]
         },
 
       ];
