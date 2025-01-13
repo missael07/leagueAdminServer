@@ -8,8 +8,9 @@ import { Category } from 'src/seed/entities/category.entity';
 import { Branch } from 'src/seed/entities/branch.entity';
 import { ResponseHandlerService } from 'src/common/handlers/respose.handler';
 import { SendEmailService } from 'src/common/services/email/sendEmail';
-import { TeamResponse } from './interfaces/responseTeam.interface';
+import { TeamResponse, UsersTeam } from './interfaces/responseTeam.interface';
 import { TeamFilter } from './interfaces/teamFilter.interface';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class TeamsService {
@@ -106,34 +107,34 @@ export class TeamsService {
     }
   }
 
-  private _getDataNewInvite(teamName: string) {
-    return {
-      url: `${process.env.WEB_URL}/signup`,
-      template: 'team-added',
-      subject: `Bienvenidos ${teamName}`
-    }
-  }
+  // private _getDataNewInvite(teamName: string) {
+  //   return {
+  //     url: `${process.env.WEB_URL}/signup`,
+  //     template: 'team-added',
+  //     subject: `Bienvenidos ${teamName}`
+  //   }
+  // }
 
-  private async _sendEmail(email: string, teamName: string, category: string, division: string) {
-    const context = { url: '', websiteName: '', teamName, leagueName: 'Liga Premier de Softball de Mexicali', email, category, division };
-    let template;
-    let subject;
+  // private async _sendEmail(email: string, teamName: string, category: string, division: string) {
+  //   const context = { url: '', websiteName: '', teamName, leagueName: 'Liga Premier de Softball de Mexicali', email, category, division };
+  //   let template;
+  //   let subject;
 
-    const newData = this._getDataNewInvite(teamName);
-    context.url = newData.url;
-    template = newData.template;
-    subject = newData.subject;
+  //   const newData = this._getDataNewInvite(teamName);
+  //   context.url = newData.url;
+  //   template = newData.template;
+  //   subject = newData.subject;
 
-    await this._sendEmailService.sendEmail(
-      email,
-      context,
-      template,
-      subject,
-    );
-  }
+  //   await this._sendEmailService.sendEmail(
+  //     email,
+  //     context,
+  //     template,
+  //     subject,
+  //   );
+  // }
 
   async create(createTeamDto: CreateTeamDto) {
-    const { category, branch, email } = createTeamDto;
+    const { category, branch } = createTeamDto;
 
     const duplicateTeam = await this._getDuplicateTeam(createTeamDto.name, branch, category, 'getDuplicateTeamCrt001');
 
@@ -152,7 +153,7 @@ export class TeamsService {
     const team = await this._createTeamObj(createTeamDto, categoryToSave, branchToSave, 'getObjCrt001');
     const result = await this._save(team, 'saveTeamCrt001');
 
-    await this._sendEmail(email, result.name, categoryToSave.name, branchToSave.name);
+    // await this._sendEmail(email, result.name, categoryToSave.name, branchToSave.name);
 
     return this._responseHanlder.handleSuccess<TeamResponse>([], 'El equipo se agrego correctamente.', this._map(result, 'mapCrt001'))
   }
@@ -290,5 +291,29 @@ export class TeamsService {
       .getMany();
 
     return this._responseHanlder.handleSuccess(teams.map(( team: Team) => ({value: team.teamId, title: team.name})), '', null);
+  }
+
+  async findTeamByUserId(userId: number) {
+    console.log(userId);
+    const team = await this._teamRepo.createQueryBuilder('t')
+    .leftJoinAndSelect('t.managers', 'u') // Relación ManyToMany entre Teams y Users
+    .leftJoinAndSelect('u.role', 'r') // Relación ManyToOne entre Users y Roles
+    .where('t.teamId = :userId', { userId })
+    .getOne();
+
+    const teamMapped: UsersTeam = {
+      teamId: team.teamId,
+      name: team.name,
+      isActive: team.isActive,
+      isPaid: team.isPaid,
+      managers: team.managers.map( (manager: User) => ({ 
+        name: `${manager.firstName} ${manager.lastName}`,
+        role: manager.role?.value,
+        email: manager.email,
+        phoneNumber: +manager.phoneNumber
+      }))
+    }
+
+    return this._responseHanlder.handleSuccess([], '', teamMapped);
   }
 }

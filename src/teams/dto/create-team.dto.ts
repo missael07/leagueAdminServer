@@ -10,9 +10,9 @@ export class CreateTeamDto {
     @Transform(({ value }) => StringUtil.clean(value))
     name: string;
 
-    @IsNotEmpty({ message: 'El e-mail es requerido.' })
-    @Transform(({ value }) => StringUtil.clean(value))
-    email: string;
+    // @IsNotEmpty({ message: 'El e-mail es requerido.' })
+    // @Transform(({ value }) => StringUtil.clean(value))
+    // email: string;
 
     @IsNotEmpty({ message: 'La Categoria es requerida.' })
     @Transform(({ value }) => isNaN(value) || value === 0 ? '' : value)

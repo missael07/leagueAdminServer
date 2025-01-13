@@ -81,6 +81,7 @@ export class AuthService {
         id: user.userId,
         userName: user.userName,
         role: user.role.value,
+        teamId: user.teams[0].teamId
       }),
     };
   }

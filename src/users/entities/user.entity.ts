@@ -55,7 +55,6 @@ export class User {
     updatedDate: Date;
 
     @ManyToMany(() => Team, (team) => team.managers)
-    @JoinTable() // Indica que esta entidad manejará la tabla intermedia
     teams: Team[];
 
     @BeforeInsert()

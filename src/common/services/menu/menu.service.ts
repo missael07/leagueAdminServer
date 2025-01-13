@@ -36,7 +36,7 @@ export class MenuService {
       .createQueryBuilder('menu')
       .innerJoinAndSelect('menu.roles', 'role')
       .where('role.value = :roleValue', { roleValue })
-      .orderBy('menu.roles', 'ASC')
+      .orderBy('menu.order', 'ASC')
       .getMany();
 
     return this._responseHandler.handleSuccess<MenuResponse>(menus.map( (menu) => (this._mapMenuResponse(menu,'mapMenuResp001'))), '',null)

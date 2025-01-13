@@ -7,6 +7,7 @@ export class MenuController {
 
   @Get()
   findAll(@Query('role') role: string) {
+    console.log(role);
     return this.menuService.getMenusByRole(+role);
   }
 

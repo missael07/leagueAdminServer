@@ -16,6 +16,9 @@ export class Menu {
     @Column('text')
     icon: string;
 
+    @Column('numeric')
+    order: number;
+
     @ManyToMany(() => Role, (role) => role.menus)
     @JoinTable({
         name: 'MenuRoles',

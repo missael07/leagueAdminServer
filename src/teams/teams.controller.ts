@@ -17,6 +17,11 @@ export class TeamsController {
     return this.teamsService.findAll(JSON.parse(data));
   }
 
+  @Get('teamByUserId')
+  findTeamByUserId(@Query('userId') userId: string) {
+    return this.teamsService.findTeamByUserId(+userId);
+  }
+
   @Get('getTeamsForSelect')
   getTeams() {
     return this.teamsService.getTeamsForSelect();

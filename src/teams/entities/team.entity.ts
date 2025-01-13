@@ -1,7 +1,7 @@
 import { Branch } from "src/seed/entities/branch.entity";
 import { Category } from "src/seed/entities/category.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('Teams')
 export class Team {
@@ -16,7 +16,7 @@ export class Team {
 
     @Column({ type: 'boolean', default: false })
     isPaid: boolean;
- 
+
     @Column({ type: 'text' })
     createdBy: string;
 
@@ -38,5 +38,16 @@ export class Team {
     branch: Branch;
 
     @ManyToMany(() => User, (user) => user.teams)
+    @JoinTable({
+        name: 'UsersTeams',
+        joinColumn: {
+            name: 'teamId',
+            referencedColumnName: 'teamId',
+        },
+        inverseJoinColumn: {
+            name: 'userId',
+            referencedColumnName: 'userId',
+        },
+    })
     managers: User[];
 }
