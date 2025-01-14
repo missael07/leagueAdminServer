@@ -1,7 +1,8 @@
+import { Roster } from "src/rosters/entities/roster.entity";
 import { Branch } from "src/seed/entities/branch.entity";
 import { Category } from "src/seed/entities/category.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('Teams')
 export class Team {
@@ -36,6 +37,10 @@ export class Team {
     @ManyToOne(() => Branch, (branch) => branch)
     @JoinColumn({ name: 'branchId' })
     branch: Branch;
+
+    @OneToMany(() => Roster, (roster) => roster.team)
+    @JoinColumn({ name: 'rosterId' })
+    rosters: Roster[];
 
     @ManyToMany(() => User, (user) => user.teams)
     @JoinTable({

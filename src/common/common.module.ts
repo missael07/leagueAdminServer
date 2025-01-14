@@ -7,10 +7,12 @@ import { Menu } from 'src/seed/entities/menu.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MenuController } from './controllers/menu.controller';
 import { MenuService } from './services/menu/menu.service';
+import { FileUploadController } from './controllers/upload-file.controller';
+import { FileUploadService } from './services/file-upload/file-upload.service';
 
 @Module({
-  controllers: [MenuController],
-  providers: [ResponseHandlerService, SendEmailService, MenuService],
+  controllers: [MenuController, FileUploadController],
+  providers: [ResponseHandlerService, SendEmailService, MenuService, FileUploadService],
   exports: [ResponseHandlerService, SendEmailService],
   imports: [
     ConfigModule,

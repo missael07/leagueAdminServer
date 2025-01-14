@@ -1,4 +1,6 @@
+import { Category } from "src/common/enums/category/category.enum";
 import { Role } from "src/common/enums/roles/role.enum";
+import { RosterResponse } from "src/rosters/interfaces/rosterResponse.interface";
 
 export interface TeamResponse {
     id: number;
@@ -16,7 +18,10 @@ export interface UsersTeam {
     name:     string;
     isActive: boolean;
     isPaid:   boolean;
+    category: Category;
+    branch:   string;
     managers: Manager[];
+    rosters:  RosterResponse[]
 }
 
 export interface Manager {
@@ -24,4 +29,8 @@ export interface Manager {
     email:  string;
     role:  Role;
     phoneNumber: number;
+}
+
+export interface Roster {
+
 }

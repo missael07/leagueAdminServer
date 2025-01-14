@@ -1,4 +1,4 @@
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
@@ -6,6 +6,8 @@ import { SeedModule } from './seed/seed.module';
 import { TeamsModule } from './teams/teams.module';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
+import { RostersModule } from './rosters/rosters.module';
+import { JwtModule } from '@nestjs/jwt';
 
 
 @Module({
@@ -26,9 +28,20 @@ import { AuthModule } from './auth/auth.module';
     SeedModule,
     TeamsModule,
     CommonModule,
-    AuthModule
+    AuthModule,
+    RostersModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          secret: configService.get('JWT_SECRET'),
+          signOptions: { expiresIn: '1h' },
+        };
+      },
+    }),
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

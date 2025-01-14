@@ -26,16 +26,20 @@ import { JWTPayload } from '../interfaces/jwt.interface';
       });
     }
   
-    async validate(payload: JWTPayload): Promise<string> {
+    async validate(payload: JWTPayload): Promise<User> {
       const { id } = payload;
   
-      const user = await this.userRepo.findOneBy({ userId: +id });
+      const user = await this.userRepo.createQueryBuilder('u')
+      .leftJoinAndSelect('u.role', 'r')
+      .leftJoinAndSelect('u.teams', 't')
+      .where('u.userId = :userId', { userId: id })
+      .getOne();;
   
       delete user.password;
       if (!user)
         this._handleErrorsService.handleExceptions('404', 'User not foud.');
-  
-      return `${user.firstName} ${user.lastName}`;
+
+      return user;
     }
   }
   

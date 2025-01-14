@@ -11,6 +11,7 @@ import { SendEmailService } from 'src/common/services/email/sendEmail';
 import { TeamResponse, UsersTeam } from './interfaces/responseTeam.interface';
 import { TeamFilter } from './interfaces/teamFilter.interface';
 import { User } from 'src/users/entities/user.entity';
+import { Roster } from 'src/rosters/entities/roster.entity';
 
 @Injectable()
 export class TeamsService {
@@ -30,13 +31,13 @@ export class TeamsService {
 
     try {
       const team = await this._teamRepo.createQueryBuilder('t')
-      .leftJoinAndSelect('t.category', 'c')
-      .leftJoinAndSelect('t.branch', 'b')
-      .where('t.name = :name', { name })
-      .andWhere('t.branchId = :branch', { branch })
-      .andWhere('t.categoryId = :category', { category })
-      .getOne();
-  
+        .leftJoinAndSelect('t.category', 'c')
+        .leftJoinAndSelect('t.branch', 'b')
+        .where('t.name = :name', { name })
+        .andWhere('t.branchId = :branch', { branch })
+        .andWhere('t.categoryId = :category', { category })
+        .getOne();
+
       return team;
     } catch (error) {
       return this._responseHanlder.handleExceptions(errCode, error.message ?? error.detail);
@@ -138,7 +139,7 @@ export class TeamsService {
 
     const duplicateTeam = await this._getDuplicateTeam(createTeamDto.name, branch, category, 'getDuplicateTeamCrt001');
 
-    if(duplicateTeam) {
+    if (duplicateTeam) {
       return this._responseHanlder.handleExceptions('getDuplicateTeamCrt002', 'Ya existe un equipo con el mismo nombre en la misma rama y categoria.');
     }
 
@@ -290,23 +291,37 @@ export class TeamsService {
       .orderBy('t.name', 'ASC')
       .getMany();
 
-    return this._responseHanlder.handleSuccess(teams.map(( team: Team) => ({value: team.teamId, title: team.name})), '', null);
+    return this._responseHanlder.handleSuccess(teams.map((team: Team) => ({ value: team.teamId, title: team.name })), '', null);
   }
 
   async findTeamByUserId(userId: number) {
-    console.log(userId);
     const team = await this._teamRepo.createQueryBuilder('t')
-    .leftJoinAndSelect('t.managers', 'u') // Relación ManyToMany entre Teams y Users
-    .leftJoinAndSelect('u.role', 'r') // Relación ManyToOne entre Users y Roles
-    .where('t.teamId = :userId', { userId })
-    .getOne();
+      .leftJoinAndSelect('t.rosters', 'rs')
+      .leftJoinAndSelect('t.managers', 'u') // Relación ManyToMany entre Teams y Users
+      .leftJoinAndSelect('u.role', 'r') // Relación ManyToOne entre Users y Roles
+      .leftJoinAndSelect('t.category', 'c') // Relación ManyToOne entre Users y Roles
+      .leftJoinAndSelect('t.branch', 'b') // Relación ManyToOne entre Users y Roles
+      .where('t.teamId = :userId', { userId })
+      .getOne();
 
     const teamMapped: UsersTeam = {
       teamId: team.teamId,
       name: team.name,
       isActive: team.isActive,
       isPaid: team.isPaid,
-      managers: team.managers.map( (manager: User) => ({ 
+      branch: team.branch.name,
+      category: team.category.value,
+      rosters: team.rosters.map((roster: Roster) => ({
+        id: roster.rosterId,
+        name: `${roster.firstName} ${roster.lastName}`,
+        firstName: roster.firstName,
+        lastName: roster.lastName,
+        isReinforcement: roster.isReinforcement,
+        imgUrl: roster.imgUrl,
+        blockedToPitch: roster.blockedToPitch,
+        blockedToPlay: roster.blockedToPlay
+      })),
+      managers: team.managers.map((manager: User) => ({
         name: `${manager.firstName} ${manager.lastName}`,
         role: manager.role?.value,
         email: manager.email,

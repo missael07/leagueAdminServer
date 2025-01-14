@@ -45,4 +45,8 @@ export class StringUtil {
     static cleanSeparators(address: string): string {
         return address.replace(/[.,\/\\#&'_-\s]/g, '').trim();
     }
+
+    static getLoggedUserFullName(user: User) {
+        return `${user.firstName} ${user.lastName}`
+    }
 }

@@ -34,6 +34,7 @@ export class UsersService {
 
     return userCount > 0 ? userCount : '';
   }
+  
   private async _getRole(roleId: number, errCode: string) {
     try {
       const role = await this._roleRepo.findOne({ where: { roleId } });

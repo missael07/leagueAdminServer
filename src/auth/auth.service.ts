@@ -7,6 +7,7 @@ import { ResponseHandlerService } from 'src/common/handlers/respose.handler';
 import { JWTPayload } from 'src/common/interfaces/jwt.interface';
 import { JwtService } from '@nestjs/jwt';
 import { AuthResponse } from './interface/authResponse';
+import { Role } from 'src/common/enums/roles/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -81,7 +82,7 @@ export class AuthService {
         id: user.userId,
         userName: user.userName,
         role: user.role.value,
-        teamId: user.teams[0].teamId
+        teamId: user.role.value === Role.admin ? 0 : user.teams[0].teamId
       }),
     };
   }
@@ -97,7 +98,6 @@ export class AuthService {
 
   async signIn(createAuthDto: CreateAuthDto) {
     const { userName, password } = createAuthDto;
-
     const user = await this._authenticate(userName, 'authSignIn001');
     await this._isUserLocked(user, 'vldUsrLck001');
     await this._isPasswordValid(user, password, 'vldPwd001');
