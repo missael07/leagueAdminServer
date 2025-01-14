@@ -10,9 +10,9 @@ export class FileUploadService {
     private readonly hresponseService: ResponseHandlerService
   ) {
     cloudinary.config({ 
-        cloud_name: 'dbmznxfot', 
-        api_key: '828997914913782', 
-        api_secret: 'bzVtFR5UCD4oSmAGKK0JcEvzZp0' // Click 'View API Keys' above to copy your API secret
+        cloud_name: process.env.CLOUD_NAME, 
+        api_key: process.env.CLOUD_API_KEY, 
+        api_secret: process.env.CLOUD_API_SECRET // Click 'View API Keys' above to copy your API secret
     });
   }
 
