@@ -295,14 +295,15 @@ export class TeamsService {
   }
 
   async findTeamByUserId(userId: number) {
-    const team = await this._teamRepo.createQueryBuilder('t')
+    const queryBuilder = await this._teamRepo.createQueryBuilder('t')
       .leftJoinAndSelect('t.rosters', 'rs')
       .leftJoinAndSelect('t.managers', 'u') // Relación ManyToMany entre Teams y Users
       .leftJoinAndSelect('u.role', 'r') // Relación ManyToOne entre Users y Roles
       .leftJoinAndSelect('t.category', 'c') // Relación ManyToOne entre Users y Roles
       .leftJoinAndSelect('t.branch', 'b') // Relación ManyToOne entre Users y Roles
-      .where('t.teamId = :userId', { userId })
-      .getOne();
+      .where('t.teamId = :userId', { userId });
+
+    const team = await queryBuilder.getOne()
 
     const teamMapped: UsersTeam = {
       teamId: team.teamId,
@@ -320,7 +321,7 @@ export class TeamsService {
         imgUrl: roster.imgUrl,
         blockedToPitch: roster.blockedToPitch,
         blockedToPlay: roster.blockedToPlay
-      })),
+      })).sort((a, b) => a.id - b.id),
       managers: team.managers.map((manager: User) => ({
         name: `${manager.firstName} ${manager.lastName}`,
         role: manager.role?.value,

@@ -7,7 +7,7 @@ import { FileUploadService } from '../services/file-upload/file-upload.service';
 import { extname } from 'path';
 
 @Controller('file-upload')
-// @Auth()
+@Auth()
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
@@ -17,8 +17,7 @@ export class FileUploadController {
       destination: './uploads',
       filename: (req, file, cb) => {
         const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        const ext = extname(file.originalname);
-        cb(null, file.originalname);
+        cb(null, `${uniqueSuffix}_${file.originalname}`);
       },
     }),
     fileFilter: (req, file, callback) => {

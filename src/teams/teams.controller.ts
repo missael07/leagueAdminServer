@@ -18,7 +18,7 @@ export class TeamsController {
   }
 
   @Get('teamByUserId')
-  findTeamByUserId(@Query('userId') userId: string) {
+  findTeamByUserId(@Query('userId') userId: string, @Query('data') data: string) {
     return this.teamsService.findTeamByUserId(+userId);
   }
 

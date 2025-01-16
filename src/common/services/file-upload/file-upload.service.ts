@@ -22,15 +22,19 @@ export class FileUploadService {
         const fileName = file.originalname;
         const folder = `uploads`;
         const fileKey = `${folder}/${fileName}`;
+        const cloudFolder = `${process.env.LEAGUE_NAME}/${process.env.NODE_ENV}`
+        console.log(fileKey)
         const uploadResult = await cloudinary.uploader
         .upload(
             fileKey, {
                 public_id: fileName,
+                folder: cloudFolder
             }
         )
      
       return this.hresponseService.handleSuccess([], '', { fileKey: uploadResult.secure_url});
     } catch (error) {
+      console.log(error);
       return this.hresponseService.handleExceptions('fileupld002', `Error uploading file: ${error.message}`);
     }
   }

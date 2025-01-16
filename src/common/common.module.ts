@@ -9,6 +9,8 @@ import { MenuController } from './controllers/menu.controller';
 import { MenuService } from './services/menu/menu.service';
 import { FileUploadController } from './controllers/upload-file.controller';
 import { FileUploadService } from './services/file-upload/file-upload.service';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   controllers: [MenuController, FileUploadController],
@@ -17,6 +19,10 @@ import { FileUploadService } from './services/file-upload/file-upload.service';
   imports: [
     ConfigModule,
     TypeOrmModule.forFeature([Role, Menu]),
+    JwtModule,
+    PassportModule.register({
+      defaultStrategy: 'jwt'
+    }),
   ]
 })
 export class CommonModule {}

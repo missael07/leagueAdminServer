@@ -103,8 +103,7 @@ export class RostersService {
   }
 
   async findAll(teamId: string) {
-    const queryBuilder = this._rosterRepository.createQueryBuilder('r')
-
+    const queryBuilder = this._rosterRepository.createQueryBuilder('r').orderBy("r.rosterId", 'ASC')
     if (teamId) {
       queryBuilder.where('r.teamId = :teamId', { teamId })
     }
