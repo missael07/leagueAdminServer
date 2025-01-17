@@ -13,13 +13,7 @@ export class FileUploadController {
 
   @Post('s3')
   @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './uploads',
-      filename: (req, file, cb) => {
-        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        cb(null, `${uniqueSuffix}_${file.originalname}`);
-      },
-    }),
+    storage: memoryStorage(),
     fileFilter: (req, file, callback) => {
       if (!file.mimetype.match(/\/(jpg|jpeg|png|pdf)$/)) {
         return callback(        

@@ -28,8 +28,8 @@ export class SeedService {
   ) { }
 
   async create() {
-    await this._createAdminUser();
     await this._createRoles();
+    await this._createAdminUser();
     await this._createPlayerTypes();
     await this._createBranches();
     await this._createCategories();
