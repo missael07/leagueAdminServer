@@ -77,6 +77,7 @@ export class AuthService {
   }
 
   private async _getToken(user: User) {
+    console.log(user);
     return {
       token: this._getJwt({
         id: user.userId,

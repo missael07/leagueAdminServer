@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { Role } from 'src/seed/entities/role.entity';
 import { User } from './entities/user.entity';
 import { ResponseHandlerService } from 'src/common/handlers/respose.handler';
@@ -10,6 +10,7 @@ import { SendEmailService } from 'src/common/services/email/sendEmail';
 import { Team } from 'src/teams/entities/team.entity';
 import { UserResponse } from './interfaces/userResponse.interface';
 import * as bcrypt from 'bcrypt';
+import { UserFilter } from './interfaces/userFilter.interface';
 
 @Injectable()
 export class UsersService {
@@ -34,7 +35,7 @@ export class UsersService {
 
     return userCount > 0 ? userCount : '';
   }
-  
+
   private async _getRole(roleId: number, errCode: string) {
     try {
       const role = await this._roleRepo.findOne({ where: { roleId } });
@@ -134,12 +135,36 @@ export class UsersService {
     return this._responseHanlder.handleSuccess<UserResponse>([], 'Usuario creado exitosamente.', this._map(result, 'mapUsrCrt001'));
   }
 
-  async findAll() {
-    const users = await this._userRepo.createQueryBuilder('u')
+  async findAll(data: UserFilter) {
+    const { term, isActive, category, team } = data;
+    const queryBuilder = await this._userRepo.createQueryBuilder('u')
       .leftJoinAndSelect('u.role', 'r')
-      .leftJoinAndSelect('u.teams', 't')
-      .getMany();
+      .leftJoinAndSelect('u.teams', 't');
 
+    if (isActive !== null) {
+      queryBuilder.andWhere('u.isActive = :isActive', { isActive })
+    }
+
+    if (category) {
+      queryBuilder.andWhere('t.categoryId = :category', { category })
+    }
+
+    if (team > 0) {
+      queryBuilder.andWhere('t.teamId = :team', { team })
+    }
+
+    if (term) {
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('u.firstName ILIKE :term', { term: `%${term}%` })
+          qb.orWhere('u.lastName ILIKE :term', { term: `%${term}%` })
+          qb.orWhere('u.userName ILIKE :term', { term: `%${term}%` })
+          qb.orWhere('u.email ILIKE :term', { term: `%${term}%` })
+        }),
+      );
+    }
+
+    const users = await queryBuilder.getMany();
     return this._responseHanlder.handleSuccess<UserResponse>(users.map((user) => (this._map(user, 'mapUsrFnd001'))), '', null);
   }
 
