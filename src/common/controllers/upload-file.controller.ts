@@ -12,25 +12,7 @@ export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
   @Post('s3')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: memoryStorage(),
-    fileFilter: (req, file, callback) => {
-      if (!file.mimetype.match(/\/(jpg|jpeg|png|pdf)$/)) {
-        return callback(        
-          new CustomValidationException([
-            {
-                property: 'file',
-                constraints: {
-                    'message': 'File must has one of the following extensions: jpg, pdf, png, jpge.'
-                }
-            }
-        ]),
-          false,
-        );
-      }
-      callback(null, true);
-    },
-  }))
+  @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new CustomValidationException([
